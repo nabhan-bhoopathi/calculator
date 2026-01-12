@@ -14,6 +14,7 @@
             --accent-secondary: #3a7bd5;
             --text-main: #ffffff;
             --btn-hover: rgba(255, 255, 255, 0.25);
+            --focus-ring: 2px solid #00d2ff;
         }
 
         * {
@@ -123,9 +124,13 @@
             justify-content: center;
         }
 
-        button:hover {
+        button:hover, button:focus {
             background: var(--btn-hover);
             transform: translateY(-2px);
+        }
+
+        button:focus {
+            box-shadow: 0 0 0 2px var(--accent-primary);
         }
 
         button:active {
@@ -181,52 +186,52 @@
 
     <div id="canvas-container"></div>
 
-    <div class="calculator-container">
-        <div class="mode-indicator" id="mode-text">RAD</div>
-        <div class="display-container">
-            <div id="history-display"></div>
-            <div id="main-display">0</div>
+    <div class="calculator-container" role="application" aria-label="3D Scientific Calculator">
+        <div class="mode-indicator" id="mode-text" aria-live="polite">RAD</div>
+        <div class="display-container" aria-live="polite">
+            <div id="history-display" aria-hidden="true"></div>
+            <div id="main-display" tabindex="0">0</div>
         </div>
 
-        <button class="btn-sci-toggle" onclick="toggleScientific()">Scientific Mode</button>
+        <button class="btn-sci-toggle" onclick="toggleScientific()" aria-expanded="false" id="toggle-sci-btn">Scientific Mode</button>
 
-        <div class="scientific-grid" id="scientific-panel">
-            <button class="sci-btn" onclick="inputSci('sin')">sin</button>
-            <button class="sci-btn" onclick="inputSci('cos')">cos</button>
-            <button class="sci-btn" onclick="inputSci('tan')">tan</button>
-            <button class="sci-btn" onclick="inputSci('log')">log</button>
-            <button class="sci-btn" onclick="inputSci('ln')">ln</button>
-            <button class="sci-btn" onclick="inputSci('sqrt')">√</button>
-            <button class="sci-btn" onclick="inputSci('pow')">xʸ</button>
-            <button class="sci-btn" onclick="inputSci('pi')">π</button>
-            <button class="sci-btn" onclick="inputSci('e')">e</button>
-            <button class="sci-btn" onclick="toggleDegRad()">D/R</button>
+        <div class="scientific-grid" id="scientific-panel" role="group" aria-label="Scientific functions">
+            <button class="sci-btn" onclick="inputSci('sin')" aria-label="sine">sin</button>
+            <button class="sci-btn" onclick="inputSci('cos')" aria-label="cosine">cos</button>
+            <button class="sci-btn" onclick="inputSci('tan')" aria-label="tangent">tan</button>
+            <button class="sci-btn" onclick="inputSci('log')" aria-label="log base 10">log</button>
+            <button class="sci-btn" onclick="inputSci('ln')" aria-label="natural log">ln</button>
+            <button class="sci-btn" onclick="inputSci('sqrt')" aria-label="square root">√</button>
+            <button class="sci-btn" onclick="inputSci('pow')" aria-label="power of">xʸ</button>
+            <button class="sci-btn" onclick="inputSci('pi')" aria-label="pi">π</button>
+            <button class="sci-btn" onclick="inputSci('e')" aria-label="euler number">e</button>
+            <button class="sci-btn" onclick="toggleDegRad()" aria-label="Toggle degrees and radians">D/R</button>
         </div>
 
         <div class="controls-row">
-            <button class="btn-operator" onclick="clearDisplay()">AC</button>
-            <button class="btn-operator" onclick="deleteLast()"><i class="fas fa-backspace"></i></button>
-            <button class="btn-operator" onclick="inputChar('%')">%</button>
-            <button class="btn-operator" onclick="inputChar('/')">÷</button>
+            <button class="btn-operator" onclick="clearDisplay()" aria-label="All Clear">AC</button>
+            <button class="btn-operator" onclick="deleteLast()" aria-label="Delete last character"><i class="fas fa-backspace"></i></button>
+            <button class="btn-operator" onclick="inputChar('%')" aria-label="percent">%</button>
+            <button class="btn-operator" onclick="inputChar('/')" aria-label="divide">÷</button>
             
             <button onclick="inputChar('7')">7</button>
             <button onclick="inputChar('8')">8</button>
             <button onclick="inputChar('9')">9</button>
-            <button class="btn-operator" onclick="inputChar('*')">×</button>
+            <button class="btn-operator" onclick="inputChar('*')" aria-label="multiply">×</button>
             
             <button onclick="inputChar('4')">4</button>
             <button onclick="inputChar('5')">5</button>
             <button onclick="inputChar('6')">6</button>
-            <button class="btn-operator" onclick="inputChar('-')">−</button>
+            <button class="btn-operator" onclick="inputChar('-')" aria-label="subtract">−</button>
             
             <button onclick="inputChar('1')">1</button>
             <button onclick="inputChar('2')">2</button>
             <button onclick="inputChar('3')">3</button>
-            <button class="btn-operator" onclick="inputChar('+')">+</button>
+            <button class="btn-operator" onclick="inputChar('+')" aria-label="add">+</button>
             
             <button onclick="inputChar('0')">0</button>
             <button onclick="inputChar('.')">.</button>
-            <button class="btn-equal" onclick="calculate()">=</button>
+            <button class="btn-equal" onclick="calculate()" aria-label="equals">=</button>
         </div>
     </div>
 
@@ -242,7 +247,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Lights
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
 
@@ -250,7 +254,6 @@
             pointLight.position.set(5, 5, 5);
             scene.add(pointLight);
 
-            // Create floating shapes
             const geometries = [
                 new THREE.IcosahedronGeometry(1, 0),
                 new THREE.TorusGeometry(0.7, 0.2, 16, 100),
@@ -295,7 +298,6 @@
                 shape.position.x += shape.userData.velocity.x;
                 shape.position.y += shape.userData.velocity.y;
 
-                // Bounce
                 if(Math.abs(shape.position.x) > 10) shape.userData.velocity.x *= -1;
                 if(Math.abs(shape.position.y) > 10) shape.userData.velocity.y *= -1;
             });
@@ -313,7 +315,7 @@
         let currentInput = "0";
         let history = "";
         let isScientific = false;
-        let angleMode = 'RAD'; // 'DEG' or 'RAD'
+        let angleMode = 'RAD'; 
 
         const mainDisplay = document.getElementById('main-display');
         const historyDisplay = document.getElementById('history-display');
@@ -328,6 +330,8 @@
         function inputChar(char) {
             if (currentInput === "0" && char !== ".") {
                 currentInput = char;
+            } else if (currentInput === "Error") {
+                currentInput = char;
             } else {
                 currentInput += char;
             }
@@ -341,7 +345,7 @@
         }
 
         function deleteLast() {
-            if (currentInput.length > 1) {
+            if (currentInput.length > 1 && currentInput !== "Error") {
                 currentInput = currentInput.slice(0, -1);
             } else {
                 currentInput = "0";
@@ -352,6 +356,7 @@
         function toggleScientific() {
             isScientific = !isScientific;
             sciPanel.classList.toggle('active');
+            document.getElementById('toggle-sci-btn').setAttribute('aria-expanded', isScientific);
         }
 
         function toggleDegRad() {
@@ -382,8 +387,6 @@
                     .replace(/÷/g, '/')
                     .replace(/\^/g, '**');
 
-                // Advanced math parsing for scientific strings
-                // We use a custom scope to handle sin/cos/etc.
                 const scope = {
                     sin: (x) => angleMode === 'DEG' ? Math.sin(x * Math.PI / 180) : Math.sin(x),
                     cos: (x) => angleMode === 'DEG' ? Math.cos(x * Math.PI / 180) : Math.cos(x),
@@ -393,12 +396,11 @@
                     sqrt: (x) => Math.sqrt(x)
                 };
 
-                // Evaluation using Function constructor with sandbox-like approach
-                // Note: In a production app, use a math library like math.js for safety and precision.
                 const keys = Object.keys(scope);
                 const values = Object.values(scope);
                 const result = new Function(...keys, `return ${expression}`)(...values);
                 
+                if (isNaN(result) || !isFinite(result)) throw new Error();
                 currentInput = Number.isInteger(result) ? result.toString() : parseFloat(result.toFixed(8)).toString();
             } catch (error) {
                 currentInput = "Error";
@@ -406,25 +408,56 @@
             updateDisplay();
         }
 
-        // Initialize everything on load
+        // --- KEYBOARD SUPPORT ---
+        window.addEventListener('keydown', (e) => {
+            const key = e.key;
+
+            // Numbers and Operators
+            if (/[0-9]/.test(key)) inputChar(key);
+            if (key === '.') inputChar('.');
+            if (key === '+') inputChar('+');
+            if (key === '-') inputChar('-');
+            if (key === '*') inputChar('*');
+            if (key === '/') {
+                e.preventDefault();
+                inputChar('/');
+            }
+            if (key === '%') inputChar('%');
+
+            // Actions
+            if (key === 'Enter' || key === '=') {
+                e.preventDefault();
+                calculate();
+            }
+            if (key === 'Backspace') deleteLast();
+            if (key === 'Escape') clearDisplay();
+
+            // Scientific Shortcuts (Ctrl/Meta + Key)
+            if (e.ctrlKey || e.metaKey) {
+                switch(key.toLowerCase()) {
+                    case 's': e.preventDefault(); inputSci('sin'); break;
+                    case 'c': e.preventDefault(); inputSci('cos'); break;
+                    case 't': e.preventDefault(); inputSci('tan'); break;
+                    case 'l': e.preventDefault(); inputSci('log'); break;
+                    case 'r': e.preventDefault(); inputSci('sqrt'); break;
+                    case 'p': e.preventDefault(); inputSci('pi'); break;
+                }
+            }
+        });
+
         window.onload = () => {
             initThree();
             animate();
             updateDisplay();
         };
 
-        // Mouse interaction for 3D effect
         window.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 2;
             const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            
-            // Tilt calculator slightly
             const calc = document.querySelector('.calculator-container');
-            calc.style.transform = `perspective(1000px) rotateX(${-y * 5}deg) rotateY(${x * 5}deg)`;
-            
-            // Move camera slightly
-            camera.position.x = x * 0.5;
-            camera.position.y = -y * 0.5;
+            calc.style.transform = `perspective(1000px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
+            camera.position.x = x * 0.3;
+            camera.position.y = -y * 0.3;
             camera.lookAt(scene.position);
         });
 
